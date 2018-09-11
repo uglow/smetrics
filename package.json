@@ -1,0 +1,63 @@
+{
+  "name": "smetrics",
+  "version": "0.0.0-development",
+  "description": "A simple tool to record metrics in a spreadsheet.",
+  "license": "MIT",
+  "files": [
+    "src",
+    "*.md"
+  ],
+  "main": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/uglow/smetrics.git"
+  },
+  "scripts": {
+    "pre-release": "npm-run-all verify test:report",
+    "commitmsg": "cz-customizable-ghooks",
+    "prepush": "npm-run-all verify test:report --silent",
+    "__semantic-release": "semantic-release pre && npm publish && semantic-release post",
+    "start": "npm run dev",
+    "test": "npm run test:unit",
+    "test:unit": "jest",
+    "test:report": "jest --coverage",
+    "test:snaps": "jest -u",
+    "test:watch": "jest --watchAll",
+    "upload-coverage": "cat test-reports/coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+    "lint": "eslint --fix src/",
+    "verify": "eslint --max-warnings=0 src/",
+    "travis-deploy-once": "travis-deploy-once",
+    "semantic-release": "semantic-release"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-customizable"
+    },
+    "cz-customizable": {
+      "config": "commitMessageConfig.js"
+    }
+  },
+  "dependencies": {
+    "app-root-path": "2.1.0",
+    "google-auth-library": "2.0.0"
+  },
+  "devDependencies": {
+    "coveralls": "3.0.2",
+    "cross-env": "3.1.4",
+    "cz-customizable": "4.0.0",
+    "cz-customizable-ghooks": "1.5.0",
+    "dotenv-safe": "6.0.0",
+    "eslint": "4.19.1",
+    "eslint-plugin-import": "2.13.0",
+    "eslint-plugin-node": "6.0.1",
+    "husky": "0.14.1",
+    "jest": "23.5.0",
+    "npm-run-all": "4.0.1",
+    "travis-deploy-once": "5.0.7",
+    "semantic-release": "15.9.14"
+  },
+  "engines": {
+    "node": ">=8.x",
+    "npm": ">=6.1"
+  }
+}

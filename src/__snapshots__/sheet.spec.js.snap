@@ -1,0 +1,88 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SheetService .addData() should call createSheet(), updateHeader() and appendData() for each record it is passed 1`] = `
+Array [
+  "sheet a",
+  Array [
+    1536627335859,
+    11,
+    "503",
+  ],
+]
+`;
+
+exports[`SheetService .addData() should call createSheet(), updateHeader() and appendData() for each record it is passed 2`] = `
+Array [
+  "sheet b",
+  Array [
+    1536627335862,
+    "car",
+  ],
+]
+`;
+
+exports[`SheetService .appendData() should be call the clientService.request() method, passing the correct data 1`] = `
+Array [
+  Array [
+    Object {
+      "data": Object {
+        "majorDimension": "ROWS",
+        "range": "'Sheet 2'!A1:C1",
+        "values": Array [
+          Array [
+            "12322311277",
+            "78",
+            12,
+          ],
+        ],
+      },
+      "method": "post",
+      "url": "https://sheets.googleapis.com/v4/spreadsheets/foo/values/'Sheet 2'!A1:C1:append?access_token=token&valueInputOption=RAW&insertDataOption=INSERT_ROWS",
+    },
+  ],
+]
+`;
+
+exports[`SheetService .createSheet() should be call the clientService.request() method, passing the correct data 1`] = `
+Array [
+  Array [
+    Object {
+      "data": Object {
+        "requests": Array [
+          Object {
+            "addSheet": Object {
+              "properties": Object {
+                "title": "Sp a ces",
+              },
+            },
+          },
+        ],
+      },
+      "method": "post",
+      "url": "https://sheets.googleapis.com/v4/spreadsheets/foo:batchUpdate?access_token=token",
+    },
+  ],
+]
+`;
+
+exports[`SheetService .updateHeader() should be call the clientService.request() method, passing the correct data 1`] = `
+Array [
+  Array [
+    Object {
+      "data": Object {
+        "majorDimension": "ROWS",
+        "range": "'Sheet 2'!A1:C1",
+        "values": Array [
+          Array [
+            "DateTime",
+            "Metric 1",
+            "Metric 2",
+          ],
+        ],
+      },
+      "method": "put",
+      "url": "https://sheets.googleapis.com/v4/spreadsheets/foo/values/'Sheet 2'!A1:C1?access_token=token&valueInputOption=RAW&includeValuesInResponse=true",
+    },
+  ],
+]
+`;

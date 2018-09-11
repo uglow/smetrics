@@ -1,0 +1,30 @@
+sudo: false
+language: node_js
+node_js:
+  - "8"
+  - "lts/*"
+
+before_install:
+  - npm i -g npm@6.1
+
+install:
+  - npm ci
+
+before_script:
+
+script:
+  - npm run pre-release
+
+after_success:
+  - npm run upload-coverage
+  - npm run travis-deploy-once "npm run semantic-release"
+
+branches:
+  except:
+    - /^v\d+\.\d+\.\d+$/
+
+notifications:
+  email:
+    recipients:
+      - u_glow@hotmail.com
+
