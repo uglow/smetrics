@@ -5,18 +5,14 @@
       "metric": "Metric 1",
       "value": 11,
       "t": 1536627335859
-    },
+    }
+  ],
+  [
     {
       "sheet": "sheet b",
       "metric": "Objects of the future",
       "value": "car",
       "t": 1536627335862
-    },
-    {
-      "sheet": "sheet a",
-      "metric": "Metric 2",
-      "value": "503",
-      "t": 1536627335863
     }
   ]
 ]

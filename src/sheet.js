@@ -27,7 +27,13 @@ class SheetService {
         try {
           await this.createSheet(sheet);
         } catch (err) {
-          console.error(err && err.errors || err);
+          if (err && err.errors && err.errors.length) {
+            if (err.errors[0].message.indexOf('already exists. Please enter another name') === -1) {
+              err.errors.forEach(console.log);
+            }
+          } else {
+            console.error(err);
+          }
         }
         // Update the header then add a new row
         await Promise.all([

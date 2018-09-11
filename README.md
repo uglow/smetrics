@@ -1,9 +1,9 @@
 # smetrics
 
-[![NPM Version](https://img.shields.io/npm/v/smetrics.svg?style=flat-square)](http://npm.im/upver)
+[![NPM Version](https://img.shields.io/npm/v/smetrics.svg?style=flat-square)](http://npm.im/smetrics)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
-[![Coverage Status](https://coveralls.io/repos/github/uglow/smetrics/badge.svg?branch=master)](https://coveralls.io/github/uglow/upver?branch=master)
-[![Dependencies status](https://david-dm.org/uglow/smetrics/status.svg?theme=shields.io)](https://david-dm.org/uglow/sheet-stats#info=dependencies)
+[![Coverage Status](https://coveralls.io/repos/github/uglow/smetrics/badge.svg?branch=master)](https://coveralls.io/github/uglow/smetrics?branch=master)
+[![Dependencies status](https://david-dm.org/uglow/smetrics/status.svg?theme=shields.io)](https://david-dm.org/uglow/smetrics#info=dependencies)
 [![Dev-dependencies status](https://david-dm.org/uglow/smetrics/dev-status.svg?theme=shields.io)](https://david-dm.org/uglow/smetrics#info=devDependencies)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
@@ -56,21 +56,31 @@ should open the corresponding Google Sheet and change the column-order to match 
 
 ## How it works
 
-Every time a metric is added using this module, a temporary file (`sheet-stats.tmp`) is created/updated in your 
+Every time a metric is added using this module, a temporary file (`smetrics.json`, [example](fixtures/smetrics.json)) is created/updated in your 
 application's root directory (using the [app-root-path](https://www.npmjs.com/package/app-root-path) module),
 with the metric name and a value:
 
 ```js
 // smetrics.json:
 [
-  { metric: 'Test Time (s)', value: 26 }, 
-  { metric: 'Time to Interactive (ms)', value: 503 },
-  // ...
+  [
+    { metric: 'Test Time (s)', value: 26 }, 
+    { metric: 'Time to Interactive (ms)', value: 503 },
+    // ...
+  ]
 ]
 ```
 
 When `commit(spreadsheet, creds)` is called, the `smetrics.json` file is appended to the specified spreadsheet as
 a new row, with the first column containing a date-time stamp (generated using `Date.now()`).
+
+
+## Hacking `smetrics`
+
+Since this package ultimately processes a file called `smetrics.json` when `smetrics.commit(...)` is called, 
+you are welcome to write to this file yourself, rather than call `smetrics.addMetric(...)`. If you stick to the same 
+format as [this example](fixtures/smetrics.json), and follow the authentication process, you
+may even add multiple rows of metrics in one go (Why would you want to? I'm not sure).
 
 
 ## Authentication
@@ -123,6 +133,11 @@ __Setup Instructions__
    - your JSON key file is generated and downloaded to your machine (__it is the only copy!__)
    - note your service account's email address (also available in the JSON key file)
 5. **Share the doc (or docs) with your service account using the email noted above.**
+
+
+## Graphing the results
+
+Once you have the data in your spreadsheet, you can provide read-access to allow other tools
 
 
 ## Contributing

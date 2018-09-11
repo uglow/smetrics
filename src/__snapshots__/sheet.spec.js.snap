@@ -1,5 +1,25 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`SheetService .addData() should be able to process two-or-more records at a time 1`] = `
+Array [
+  "sheet a",
+  Array [
+    1536627335859,
+    11,
+  ],
+]
+`;
+
+exports[`SheetService .addData() should be able to process two-or-more records at a time 2`] = `
+Array [
+  "sheet b",
+  Array [
+    1536627335862,
+    "car",
+  ],
+]
+`;
+
 exports[`SheetService .addData() should call createSheet(), updateHeader() and appendData() for each record it is passed 1`] = `
 Array [
   "sheet a",

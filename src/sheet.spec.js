@@ -97,16 +97,36 @@ describe('SheetService', () => {
 
     it('should still add data even if createSheet() rejects (as happens when the sheet exists already)', async () => {
       const service = new SheetService('foo');
-      service.createSheet = jest.fn().mockRejectedValue();
+      service.createSheet = jest.fn().mockRejectedValue({ errors: [{ message: 'Invalid requests[0].addSheet: A sheet with the name "sheet a" already exists. Please enter another name.'}]});
       service.updateHeader = jest.fn().mockResolvedValue();
       service.appendData = jest.fn().mockResolvedValue();
 
-      // Well this is a bit weird! Thanks to Jest. In non-Jest context, you don't need to do this.
+      // Well this is a bit weird (below)! Thanks to Jest. In non-Jest contexts, you don't need to do this.
       await await await service.addData(require('../fixtures/smetrics.json'));
 
       expect(service.createSheet.mock.calls.length).toEqual(2);
       expect(service.updateHeader.mock.calls.length).toEqual(2);
       expect(service.appendData.mock.calls.length).toEqual(2);
+    });
+
+
+    it('should be able to process two-or-more records at a time', async () => {
+      const service = new SheetService('foo');
+      service.createSheet = jest.fn().mockResolvedValue();
+      service.updateHeader = jest.fn().mockResolvedValue();
+      service.appendData = jest.fn().mockResolvedValue();
+
+      // Well this is a bit weird (below)! Thanks to Jest. In non-Jest contexts, you don't need to do this.
+      await await await service.addData(require('../fixtures/smetrics-multiple.json'));
+
+      expect(service.createSheet.mock.calls[0]).toEqual(['sheet a']);
+      expect(service.createSheet.mock.calls[1]).toEqual(['sheet b']);
+
+      expect(service.updateHeader.mock.calls[0]).toEqual(['sheet a', ['DateTime', 'Metric 1']]);
+      expect(service.updateHeader.mock.calls[1]).toEqual(['sheet b', ['DateTime', 'Objects of the future']]);
+
+      expect(service.appendData.mock.calls[0]).toMatchSnapshot();
+      expect(service.appendData.mock.calls[1]).toMatchSnapshot();
     });
   });
 });
