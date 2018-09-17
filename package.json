@@ -19,6 +19,7 @@
     "__semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "start": "npm run dev",
     "test": "npm run test:unit",
+    "test:int": "node ./test/integration-test.js",
     "test:unit": "jest",
     "test:report": "jest --coverage",
     "test:snaps": "jest -u",

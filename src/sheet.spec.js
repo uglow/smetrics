@@ -83,7 +83,7 @@ describe('SheetService', () => {
       service.appendData = jest.fn().mockResolvedValue();
 
       // Well this is a bit weird! Thanks to Jest. In non-Jest context, you don't need to do this.
-      await await await service.addData(require('../fixtures/smetrics.json'));
+      await await await await service.addData(require('../fixtures/smetrics.json'));
 
       expect(service.createSheet.mock.calls[0]).toEqual(['sheet a']);
       expect(service.createSheet.mock.calls[1]).toEqual(['sheet b']);
@@ -102,7 +102,7 @@ describe('SheetService', () => {
       service.appendData = jest.fn().mockResolvedValue();
 
       // Well this is a bit weird (below)! Thanks to Jest. In non-Jest contexts, you don't need to do this.
-      await await await service.addData(require('../fixtures/smetrics.json'));
+      await await await await service.addData(require('../fixtures/smetrics.json'));
 
       expect(service.createSheet.mock.calls.length).toEqual(2);
       expect(service.updateHeader.mock.calls.length).toEqual(2);
@@ -117,7 +117,7 @@ describe('SheetService', () => {
       service.appendData = jest.fn().mockResolvedValue();
 
       // Well this is a bit weird (below)! Thanks to Jest. In non-Jest contexts, you don't need to do this.
-      await await await service.addData(require('../fixtures/smetrics-multiple.json'));
+      await await await await service.addData(require('../fixtures/smetrics-multiple.json'));
 
       expect(service.createSheet.mock.calls[0]).toEqual(['sheet a']);
       expect(service.createSheet.mock.calls[1]).toEqual(['sheet b']);

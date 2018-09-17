@@ -36,11 +36,9 @@ class SheetService {
           }
         }
         // Update the header then add a new row
-        await Promise.all([
-          this.updateHeader(sheet, ['DateTime'].concat(groupedItems[sheet].map(item => item.metric))),
-          this.appendData(sheet, [groupedItems[sheet][0].t].concat(groupedItems[sheet].map(item => item.value))),
-        ]);
-      })
+        await this.updateHeader(sheet, ['DateTime'].concat(groupedItems[sheet].map(item => item.metric)))
+          .then(() => this.appendData(sheet, [groupedItems[sheet][0].t].concat(groupedItems[sheet].map(item => item.value))));
+      });
     });
   }
 
