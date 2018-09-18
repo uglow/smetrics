@@ -41,11 +41,12 @@ addUnitTestMetrics();
 // See Authentication section for how to generate this information
 const creds = require('./google-generated-creds.json');
 // OR, if you cannot save the file locally (like on heroku)
-const creds = {
+const options = {
   client_email: process.env.SMETRICS_GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL,
-  private_key: process.env.SMETRICS_GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY
+  private_key: process.env.SMETRICS_GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY,
+  dateTimeFormat: 'googleDate', // defaults to 'milliseconds'
 }
-smetrics.commit('<spreadsheet key>', creds); // Async - returns a promise 
+smetrics.commit('<spreadsheet key>', options); // Async - returns a promise 
 
 ```
 
@@ -53,6 +54,25 @@ smetrics.commit('<spreadsheet key>', creds); // Async - returns a promise
 **The order that metrics are added is significant.** If you decide to change the order that you add metrics, you
 should open the corresponding Google Sheet and change the column-order to match your new metric-capturing order.
 
+
+### The `options` parameter
+
+#### `client_email` (string)
+
+This value is available in the JSON file that you can download when setting up Authentication with a service account.
+
+#### `private_key` (string)
+
+This value is available in the JSON file that you can download when setting up Authentication with a service account.
+
+#### `dateTimeFormat` (string, default = 'milliseconds')
+
+The default format for the DateTime column is `milliseconds`, which is the number of milliseconds since the epoch (e.g. 1537165777561, 
+which is equivalent to Mon Sep 17 2018 16:29:37 GMT+1000 (Australian Eastern Standard Time)).
+
+Alternately, you can specify the format as `googleDate`, which formats the date as `dd-mon-yyyy hh:mm:ss`. 
+Google sheets interprets this string as a date, and can be used correctly when the data is charted. You
+may need to manually format the DateTime column as a 'Date Time' in the Google Sheet (once-only).
 
 ## How it works
 

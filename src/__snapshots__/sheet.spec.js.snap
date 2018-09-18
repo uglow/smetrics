@@ -1,5 +1,26 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`SheetService .addData() should apply the dateFormat correctly when calling appendData() 1`] = `
+Array [
+  "sheet a",
+  Array [
+    "18-Sep-2018 0:15:59",
+    11,
+    "503",
+  ],
+]
+`;
+
+exports[`SheetService .addData() should apply the dateFormat correctly when calling appendData() 2`] = `
+Array [
+  "sheet b",
+  Array [
+    "18-Sep-2018 0:16:09",
+    "car",
+  ],
+]
+`;
+
 exports[`SheetService .addData() should be able to process two-or-more records at a time 1`] = `
 Array [
   "sheet a",
@@ -24,7 +45,7 @@ exports[`SheetService .addData() should call createSheet(), updateHeader() and a
 Array [
   "sheet a",
   Array [
-    1536627335859,
+    1537229759962,
     11,
     "503",
   ],
@@ -35,7 +56,7 @@ exports[`SheetService .addData() should call createSheet(), updateHeader() and a
 Array [
   "sheet b",
   Array [
-    1536627335862,
+    1537229769962,
     "car",
   ],
 ]
@@ -57,7 +78,7 @@ Array [
         ],
       },
       "method": "post",
-      "url": "https://sheets.googleapis.com/v4/spreadsheets/foo/values/'Sheet 2'!A1:C1:append?access_token=token&valueInputOption=RAW&insertDataOption=INSERT_ROWS",
+      "url": "https://sheets.googleapis.com/v4/spreadsheets/foo/values/'Sheet 2'!A1:C1:append?access_token=token&valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS",
     },
   ],
 ]

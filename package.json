@@ -58,7 +58,7 @@
     "semantic-release": "15.9.14"
   },
   "engines": {
-    "node": ">=8.x",
+    "node": ">=8.2",
     "npm": ">=6.1"
   }
 }

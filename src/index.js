@@ -33,10 +33,10 @@ function addMetric(category, metric, value, timeStamp = Date.now()) {
 
 /**
  * Attempts to write to Google sheets using the credentials supplied. Asynchronous (returns a Promise)
- * @param spreadsheetKey
- * @param credentials
+ * @param spreadsheetKey {string}
+ * @param options {Object}
  */
-async function commit(spreadsheetKey, credentials, sheetService = new SheetService(spreadsheetKey)) {
+async function commit(spreadsheetKey, options, sheetService = new SheetService(spreadsheetKey, options)) {
   let data;
   try {
     data = readMetricFile();
@@ -45,7 +45,7 @@ async function commit(spreadsheetKey, credentials, sheetService = new SheetServi
     return;
   }
 
-  await sheetService.authorize(credentials);
+  await sheetService.authorize(options);
 
   // Check if the first row has data.
   try {

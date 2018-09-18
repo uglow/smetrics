@@ -3,11 +3,24 @@ const {JWT} = require('google-auth-library');
 const GOOGLE_AUTH_SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 const SHEETS_API = 'https://sheets.googleapis.com/v4/spreadsheets/';
 
-class SheetService {
-  constructor(spreadsheetId) {
-    if (!spreadsheetId) throw new Error('Spreadsheet id must be supplied');
+const MONTH = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+const DATE_FORMATS = {
+  milliseconds: (val) => val,
+  googleDate: (val) => {
+    const d = new Date(val);
+    return [d.getUTCDate(), MONTH[d.getUTCMonth()], d.getUTCFullYear()].join('-') +
+      ' ' + [d.getUTCHours(), String(d.getUTCMinutes()).padStart(2, '0'), String(d.getSeconds()).padStart(2, '0')].join(':')
+  },
+};
+
+class SheetService {
+  constructor(spreadsheetId, { dateFormat = 'milliseconds' } = {}) {
+    if (!spreadsheetId) throw new Error('Spreadsheet id must be supplied');
     this.spreadsheetId = spreadsheetId;
+
+    if (!DATE_FORMATS[dateFormat]) throw new Error(`Invalid dateFormat. dateFormat must be one of: ${Object.keys(DATE_FORMATS).join(', ')}`);
+    this.dateFormat = dateFormat;
   }
 
   authorize(creds, authService = JWT) {
@@ -37,7 +50,7 @@ class SheetService {
         }
         // Update the header then add a new row
         await this.updateHeader(sheet, ['DateTime'].concat(groupedItems[sheet].map(item => item.metric)))
-          .then(() => this.appendData(sheet, [groupedItems[sheet][0].t].concat(groupedItems[sheet].map(item => item.value))));
+          .then(() => this.appendData(sheet, [DATE_FORMATS[this.dateFormat](groupedItems[sheet][0].t)].concat(groupedItems[sheet].map(item => item.value))));
       });
     });
   }
@@ -62,7 +75,7 @@ class SheetService {
 
   async appendData(sheetName, values) {
     const range = `'${sheetName}'!A1:${columnToLetter(values.length)}1`; // +1 is the DateTime generated-column
-    const url = `${SHEETS_API}${this.spreadsheetId}/values/${range}:append?access_token=${this.client.credentials.access_token}&valueInputOption=RAW&insertDataOption=INSERT_ROWS`;
+    const url = `${SHEETS_API}${this.spreadsheetId}/values/${range}:append?access_token=${this.client.credentials.access_token}&valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
     const data = {
       range,
       majorDimension: 'ROWS',

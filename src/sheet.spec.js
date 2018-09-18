@@ -15,7 +15,20 @@ describe('SheetService', () => {
 
   it('should be createable using a non-blank spreadsheet id', () => {
     expect(() => new SheetService()).toThrow('Spreadsheet id must be supplied');
-    expect(new SheetService('foo')).toBeDefined();
+
+    const service = new SheetService('foo');
+    expect(service).toBeDefined();
+    expect(service.dateFormat).toEqual('milliseconds');
+  });
+
+  it('should be possible to specify the dateFormat as "googleDate" or "milliseconds"', () => {
+    let service = new SheetService('foo', {dateFormat: 'googleDate'});
+    expect(service.dateFormat).toEqual('googleDate');
+
+    service = new SheetService('foo', {dateFormat: 'milliseconds'});
+    expect(service.dateFormat).toEqual('milliseconds');
+
+    expect(() => new SheetService('foo', {dateFormat: 'unknown'})).toThrow('Invalid dateFormat. dateFormat must be one of: milliseconds, googleDate');
   });
 
   describe('.authorize()', () => {
@@ -78,6 +91,25 @@ describe('SheetService', () => {
   describe('.addData()', () => {
     it('should call createSheet(), updateHeader() and appendData() for each record it is passed', async () => {
       const service = new SheetService('foo');
+      service.createSheet = jest.fn().mockResolvedValue();
+      service.updateHeader = jest.fn().mockResolvedValue();
+      service.appendData = jest.fn().mockResolvedValue();
+
+      // Well this is a bit weird! Thanks to Jest. In non-Jest context, you don't need to do this.
+      await await await await service.addData(require('../fixtures/smetrics.json'));
+
+      expect(service.createSheet.mock.calls[0]).toEqual(['sheet a']);
+      expect(service.createSheet.mock.calls[1]).toEqual(['sheet b']);
+
+      expect(service.updateHeader.mock.calls[0]).toEqual(['sheet a', ['DateTime', 'Metric 1', 'Metric 2']]);
+      expect(service.updateHeader.mock.calls[1]).toEqual(['sheet b', ['DateTime', 'Objects of the future']]);
+
+      expect(service.appendData.mock.calls[0]).toMatchSnapshot();
+      expect(service.appendData.mock.calls[1]).toMatchSnapshot();
+    });
+
+    it('should apply the dateFormat correctly when calling appendData()', async () => {
+      const service = new SheetService('foo', { dateFormat: 'googleDate' });
       service.createSheet = jest.fn().mockResolvedValue();
       service.updateHeader = jest.fn().mockResolvedValue();
       service.appendData = jest.fn().mockResolvedValue();
