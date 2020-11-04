@@ -1,6 +1,6 @@
 {
   "name": "smetrics",
-  "version": "0.0.0-development",
+  "version": "2.0.0",
   "description": "A simple tool to record metrics in a spreadsheet.",
   "license": "MIT",
   "files": [
