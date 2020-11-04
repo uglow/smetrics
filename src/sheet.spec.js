@@ -3,14 +3,13 @@
 const { SheetService } = require('./sheet');
 
 describe('SheetService', () => {
-
   function getMockClient(mockResponse = '') {
     return {
       credentials: {
         access_token: 'token',
       },
-      request: jest.fn().mockResolvedValue({data: mockResponse})
-    }
+      request: jest.fn().mockResolvedValue({ data: mockResponse }),
+    };
   }
 
   it('should be createable using a non-blank spreadsheet id', () => {
@@ -22,36 +21,43 @@ describe('SheetService', () => {
   });
 
   it('should be possible to specify the dateFormat as "googleDate" or "milliseconds"', () => {
-    let service = new SheetService('foo', {dateFormat: 'googleDate'});
+    let service = new SheetService('foo', { dateFormat: 'googleDate' });
     expect(service.dateFormat).toEqual('googleDate');
 
-    service = new SheetService('foo', {dateFormat: 'milliseconds'});
+    service = new SheetService('foo', { dateFormat: 'milliseconds' });
     expect(service.dateFormat).toEqual('milliseconds');
 
-    expect(() => new SheetService('foo', {dateFormat: 'unknown'})).toThrow('Invalid dateFormat. dateFormat must be one of: milliseconds, googleDate');
+    expect(() => new SheetService('foo', { dateFormat: 'unknown' })).toThrow(
+      'Invalid dateFormat. dateFormat must be one of: milliseconds, googleDate',
+    );
   });
 
   describe('.authorize()', () => {
     it('should be call the clientService.authorize() method, passing the credentials and scopes', () => {
       const service = new SheetService('foo');
-      const mockAuthService = function(...params) {
+      const mockAuthService = function (...params) {
         return {
           authorize() {},
-          params: params
+          params: params,
         };
       };
 
-      service.authorize({
-        client_email: 'a@b.com',
-        private_key: 'really long key',
-      }, mockAuthService);
+      service.authorize(
+        {
+          clientEmail: 'a@b.com',
+          privateKey: 'really long key',
+        },
+        mockAuthService,
+      );
 
       // The client was called with the following params
-      expect(service.client.params).toEqual([{
-        email: 'a@b.com',
-        key: 'really long key',
-        scopes: ['https://www.googleapis.com/auth/spreadsheets']
-      }]);
+      expect(service.client.params).toEqual([
+        {
+          email: 'a@b.com',
+          key: 'really long key',
+          scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+        },
+      ]);
     });
   });
 
@@ -129,7 +135,14 @@ describe('SheetService', () => {
 
     it('should still add data even if createSheet() rejects (as happens when the sheet exists already)', async () => {
       const service = new SheetService('foo');
-      service.createSheet = jest.fn().mockRejectedValue({ errors: [{ message: 'Invalid requests[0].addSheet: A sheet with the name "sheet a" already exists. Please enter another name.'}]});
+      service.createSheet = jest.fn().mockRejectedValue({
+        errors: [
+          {
+            message:
+              'Invalid requests[0].addSheet: A sheet with the name "sheet a" already exists. Please enter another name.',
+          },
+        ],
+      });
       service.updateHeader = jest.fn().mockResolvedValue();
       service.appendData = jest.fn().mockResolvedValue();
 
@@ -140,7 +153,6 @@ describe('SheetService', () => {
       expect(service.updateHeader.mock.calls.length).toEqual(2);
       expect(service.appendData.mock.calls.length).toEqual(2);
     });
-
 
     it('should be able to process two-or-more records at a time', async () => {
       const service = new SheetService('foo');
@@ -162,4 +174,3 @@ describe('SheetService', () => {
     });
   });
 });
-

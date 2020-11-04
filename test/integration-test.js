@@ -7,8 +7,8 @@ smetrics.addMetric('sheet b', 'Objects of the future', new Date().getSeconds());
 smetrics.addMetric('sheet a', 'Metric 2', new Date().getDay());
 
 smetrics.commit(process.env.SMETRICS_SPREADSHEET_ID, {
-  client_email: process.env.SMETRICS_GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL,
-  private_key: process.env.SMETRICS_GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY,
+  clientEmail: process.env.SMETRICS_GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL,
+  privateKey: process.env.SMETRICS_GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY,
   dateFormat: 'googleDate',
 }).catch(err => {
   console.log(err);

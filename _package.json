@@ -17,8 +17,9 @@
     "prepush": "npm-run-all verify test:report --silent",
     "test": "npm run test:unit",
     "test:int": "node ./test/integration-test.js",
-    "test:unit": "jest --detectOpenHandles --forceExit",
-    "test:report": "jest --coverage --detectOpenHandles --forceExit",
+    "test:unit": "jest",
+    "test:report": "jest --coverage",
+    "test:snaps": "jest -u",
     "test:watch": "jest --watchAll",
     "upload-coverage": "coveralls < test-reports/coverage/lcov.info",
     "lint": "eslint --fix src/",
@@ -39,9 +40,7 @@
     "google-auth-library": "6.1.3"
   },
   "devDependencies": {
-    "@babel/core": "7.12.3",
-    "@semantic-release/changelog": "5.0.1",
-    "@semantic-release/git": "9.0.0",
+    "@getify/eslint-plugin-proper-arrows": "10.0.0",
     "coveralls": "3.1.0",
     "cross-env": "7.0.2",
     "cz-customizable": "6.3.0",
