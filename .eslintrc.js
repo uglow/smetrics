@@ -1,31 +1,40 @@
 module.exports = {
   root: true,
+  parserOptions: {
+    ecmaVersion: 2019,
+  },
+
   env: {
     es6: true,
-    node: true,
-    jest: true,
+    'jest/globals': true,
   },
+
   extends: [
-    'eslint:recommended',
-    'plugin:import/errors',
-    'plugin:import/warnings',
-    'plugin:node/recommended',
+    'plugin:prettier/recommended',
+    'plugin:unicorn/recommended',
+    'plugin:node/recommended-script',
+    'plugin:jest/recommended',
   ],
-
-  // required to lint *.vue files
-  plugins: ['node'],
-  // add your custom rules here
+  plugins: ['jest'],
   rules: {
-    'prefer-const': 'error',
-    'no-var': 'error',
+    // Allow some flexibility here
+    'unicorn/prevent-abbreviations': 'off',
 
-    // Turn off this rule as it is needed for web-component-lib integration (Nuxt.js doesn't like ESM files, yet)
-    'import/no-webpack-loader-syntax': 'off',
-    'import/no-unresolved': 'off',
-    'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    // Use camelCase for files (and directories - not enforced)
+    'unicorn/filename-case': ['error', { case: 'camelCase' }],
 
-    // Turn off node/no-unsupported-features because it complains about import & export
-    'node/no-unsupported-features': 'off',
+    // Turn off explicit length checks
+    'unicorn/explicit-length-check': 'off',
+
+    // Turning off because it leads to many uses of the word 'error' in the same block, which is confusing
+    // E.g.
+    // } catch(error) {
+    //   logger.error(error);
+    //   return error(error);
+    // }
+    'unicorn/catch-error-name': 'off',
+
+    // This rule is no good for test specs. Need to find a way to disable this for test specs
+    'unicorn/consistent-function-scoping': 'off',
   },
 };

@@ -1,23 +1,18 @@
-sudo: false
 language: node_js
-node_js:
-  - "8"
-  - "lts/*"
 
-before_install:
-  - npm i -g npm@6.1
+node_js:
+  - '10'
 
 install:
-  - npm ci
-
-before_script:
+  - npm install
 
 script:
-  - npm run pre-release
+  - npm run verify
+  - npm run test:report
 
 after_success:
   - npm run upload-coverage
-  - npm run travis-deploy-once "npm run semantic-release"
+  - npm run semantic-release
 
 branches:
   except:
@@ -27,4 +22,3 @@ notifications:
   email:
     recipients:
       - u_glow@hotmail.com
-

@@ -29,9 +29,10 @@ const smetrics = require('smetrics');
 
 function addUnitTestMetrics() {
   const stats = require('./test-reports/unit.json');
+  const tabName = 'My Stats';
   
-  smetrics.addMetric('Total tests', stats.numTotalTests);
-  smetrics.addMetric('Passed tests', stats.numPassedTests);
+  smetrics.addMetric(tabName, 'Total tests', stats.numTotalTests);
+  smetrics.addMetric(tabName, 'Passed tests', stats.numPassedTests);
 }
 
 // Gather all the metrics then commit them to Google Sheets
@@ -42,9 +43,10 @@ addUnitTestMetrics();
 const creds = require('./google-generated-creds.json');
 // OR, if you cannot save the file locally (like on heroku)
 const options = {
-  client_email: process.env.SMETRICS_GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL,
-  private_key: process.env.SMETRICS_GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY,
-  dateTimeFormat: 'googleDate', // defaults to 'milliseconds'
+  clientEmail: process.env.SMETRICS_GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL,
+  privateKey: process.env.SMETRICS_GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY,
+  dateTimeFormat: 'googleDate', // defaults to 'milliseconds',
+  filePath: '/tmp/yourfile.json' // defaults to CWD + 'smetrics.json'
 }
 smetrics.commit('<spreadsheet key>', options); // Async - returns a promise 
 
@@ -54,20 +56,60 @@ smetrics.commit('<spreadsheet key>', options); // Async - returns a promise
 **The order that metrics are added is significant.** If you decide to change the order that you add metrics, you
 should open the corresponding Google Sheet and change the column-order to match your new metric-capturing order.
 
+### Usage within AWS Lambda functions
 
-### The `options` parameter
+Because this library persists state to a file, you need to specify the `filePath` when calling `addMetric` and `commit`
+with a path underneath the `/tmp` directory:
 
-#### `client_email` (string)
+``` js
+const fs = require('fs');
+const smetrics = require('smetrics');
 
-This value is available in the JSON file that you can download when setting up Authentication with a service account.
+// NOTE: filePath is specified explicitly, under the '/tmp' folder
+smetrics.addMetric(tabName, 'Total tests', stats.numTotalTests, { filePath: '/tmp/smetrics.json' });
 
-#### `private_key` (string)
+// See Authentication section for how to generate this information
+const creds = require('./google-generated-creds.json');
+// OR, if you cannot save the file locally (like on heroku)
+const options = {
+  clientEmail: process.env.SMETRICS_GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL,
+  privateKey: process.env.SMETRICS_GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY,
+  dateTimeFormat: 'googleDate',
 
-This value is available in the JSON file that you can download when setting up Authentication with a service account.
+  // NOTE: filePath is specified explicitly:
+  filePath: '/tmp/smetrics.json'
+}
+smetrics.commit('<spreadsheet key>', options); // Async - returns a promise 
 
-#### `dateTimeFormat` (string, default = 'milliseconds')
+```
 
-The default format for the DateTime column is `milliseconds`, which is the number of milliseconds since the epoch (e.g. 1537165777561, 
+## API
+
+### `addMetric(sheetName, column, value, options) : object`
+
+Adds a metric to the temporary metric-file 
+
+- `sheetName` <string> The name of the sheet within the spreadsheet
+- `column` <string> The name of the column within the sheet
+- `value` <any> The value to store
+- `options` <object> (optional):
+  - `timestamp` <timeMillis> The timestamp to associate with the metric. Defaults to the current time.
+  - `filePath` <string> The file path to write the metric data to. Defaults to current working directory 'smetrics.json'
+
+### `commit(spreadsheetKey, options) : void`
+
+- `spreadsheetId` <string> The SpreadsheetId
+
+Reads the metrics in the metric-data file ('smetrics.json') and persists it to the
+designated Google Sheet.
+
+- `sheetName` <string> The name of the sheet within the spreadsheet
+- `options` <object>:
+  - `clientEmail` <string> This value is available in the JSON file that you can download when setting up Authentication with a service account.
+  - `privateKey` <string> This value is available in the JSON file that you can download when setting up Authentication with a service account.
+  - `dateFormat` <string> Default value 'milliseconds'.
+
+The default format for DateTime columns is `milliseconds`, which is the number of milliseconds since the epoch (e.g. 1537165777561, 
 which is equivalent to Mon Sep 17 2018 16:29:37 GMT+1000 (Australian Eastern Standard Time)).
 
 Alternately, you can specify the format as `googleDate`, which formats the date as `dd-mon-yyyy hh:mm:ss`. 
@@ -76,9 +118,8 @@ may need to manually format the DateTime column as a 'Date Time' in the Google S
 
 ## How it works
 
-Every time a metric is added using this module, a temporary file (`smetrics.json`, [example](fixtures/smetrics.json)) is created/updated in your 
-application's root directory (using the [app-root-path](https://www.npmjs.com/package/app-root-path) module),
-with the metric name and a value:
+Every time a metric is added, a temporary file (`smetrics.json`, [example](fixtures/smetrics.json)) is created/updated in your 
+current working directory with the metric name and a value:
 
 ```js
 // smetrics.json:
@@ -105,29 +146,6 @@ may even add multiple rows of metrics in one go (Why would you want to? I'm not 
 
 ## Authentication
 
-IMPORTANT: Google recently deprecated their ClientLogin (username+password)
-access, so things are slightly more complicated now. Older versions of this
-module supported it, so just be aware that things changed.
-
-### Unauthenticated access (read-only access on public docs)
-
-By default, this module makes unauthenticated requests and can therefore
-only access spreadsheets that are "public".
-
-The Google Spreadsheets Data API reference and developers guide is a little
-ambiguous about how you access a "published" public Spreadsheet.
-
-If you wish to work with a Google Spreadsheet without authenticating, not only
-must the Spreadsheet in question be visible to the web, but it must also have
-been explicitly published using "File > Publish to the web" menu option in
-the google spreadsheets GUI.
-
-Many seemingly "public" sheets have not also been "published" so this may
-cause some confusion.
-
-*Unauthenticated requests allow reading, but not writing to sheets. To write on a sheet, you must authenticate.*
-
-
 ### Service Account (recommended method)
 
 This is a 2-legged OAuth method and designed to be "an account that belongs to your application instead of to an individual end user".
@@ -137,28 +155,43 @@ Use this for an app that needs to access a set of documents that you have full a
 __Setup Instructions__
 
 1. Go to the [Google Developers Console](https://console.developers.google.com/project)
-2. Select your project or create a new one (and then select it)
-3. Enable the Drive API for your project
-   - In the sidebar on the left, expand __APIs & auth__ > __APIs__
-   - Search for "drive"
-   - Click on "Drive API" or "Google Sheets API"
-   - click the blue "Enable API" button
-4. Create a service account for your project
-   - In the sidebar on the left, expand __APIs & auth__ > __Credentials__
-   - Click blue "Add credentials" button
-   - Select the "Service account" option
-   - Select "Furnish a new private key" checkbox
-   - Select the "JSON" key type option
-   - Click blue "Create" button
-   - your JSON key file is generated and downloaded to your machine (__it is the only copy!__)
-   - note your service account's email address (also available in the JSON key file)
-5. **Share the doc (or docs) with your service account using the email noted above.**
+1. Select your project or create a new one (and then select it)
+1. Enable the Drive API for your project
+   1. In the sidebar on the left, expand APIs & auth > APIs
+   1. Search for "sheets"
+   1. Click on "Google Sheets API"
+   1. Click the blue "Enable API" button
+1. Create a service account for your project:
+   1. In the sidebar on the left, expand IAM & Admin > Service Accounts
+   1. Click "Create Service Account" button
+   1. Enter the service account name & a description for step 1 and press Create.
+   1. Skip steps 2 & 3 by pressing Cancel
+   1. In the Service Accounts panel, select Actions > Create Key
+   1. Select the "JSON" key type option
+   1. Click blue "Create" button.
+   
+Your JSON key file is generated and downloaded to your machine (it is the only copy!)
+note your service account's email address (also available in the JSON key file)
+Share the doc (or docs) with your service account using the email noted above.
 
+The `private_key` field in the JSON file that is the private key.
+
+### Sharing the sheet with the service account
+
+1. Open the Google Sheet
+1. Press the Share button.
+1. In the Share dialog, type the service accounts email: your-service-account-name@google-app.iam.gserviceaccount.com
+1. Press Send.
+
+## Spreadsheet ID
+
+The Spreadsheet ID can be found in the URL of the spreadsheet.
+
+E.g. docs.google.com/spreadsheets/d/spreadhseetID/edit#gid=0
 
 ## Graphing the results
 
 Once you have the data in your spreadsheet, you can provide read-access to allow other tools
-
 
 ## Contributing
 

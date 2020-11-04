@@ -1,62 +1,64 @@
 'use strict';
 
-const appRoot = require('app-root-path');
 const fs = require('fs');
 const path = require('path');
 const { SheetService } = require('./sheet');
 
-const METRICS_FILE = 'smetrics.json';
+const METRICS_FILE = path.resolve(process.cwd(), 'smetrics.json');
 
 /**
  * Adds a metric to the metric file. Synchronous
- * @param categort - will become the sheetname that the metric is added too.
- * @param metric
+ * @param sheetName - will become the sheetname that the metric is added too.
+ * @param column
  * @param value
  * @param timestamp
+ * @param filePath
  * @returns {Object}
  */
-function addMetric(category, metric, value, timeStamp = Date.now()) {
-  const filePath = path.resolve(appRoot.toString(), METRICS_FILE);
-
+function addMetric(sheetName, column, value, { timestamp = Date.now(), filePath = METRICS_FILE }) {
   // Before adding a metric, setup the temporary metric file
   initMetricsFile(filePath);
 
   const metrics = readMetricFile(filePath); // Initial value: [[]]
 
   // Add the metric to the first item. Other processes may add other rows.
-  metrics[0].push({ sheet: category, metric: String(metric), value, t: timeStamp });
-  fs.writeFileSync(filePath, JSON.stringify(metrics, null, '  '));
+  metrics[0].push({ sheet: sheetName, metric: String(column), value, t: timestamp });
+  fs.writeFileSync(filePath, JSON.stringify(metrics, undefined, '  '));
 
   return metrics;
 }
 
-
 /**
  * Attempts to write to Google sheets using the credentials supplied. Asynchronous (returns a Promise)
- * @param spreadsheetKey {string}
- * @param options {Object}
+ * @param spreadsheetId {string}
+ * @param options {object}
+ * @param options.clientEmail {string}
+ * @param options.dateFormat {string}   Used by the sheetService
+ * @param options.filePath {string}
+ * @param options.privateKey {string}
+ * @param sheetService {class}
  */
-async function commit(spreadsheetKey, options, sheetService = new SheetService(spreadsheetKey, options)) {
+async function commit(spreadsheetId, options, sheetService = new SheetService(spreadsheetId, options)) {
   let data;
+  const { filePath = METRICS_FILE, clientEmail, privateKey } = options;
   try {
-    data = readMetricFile();
-  } catch(err) {
-    console.error(`${METRICS_FILE} file was not found in ${appRoot.toString()}`);
+    data = readMetricFile(filePath);
+  } catch (err) {
+    console.error(`Metrics file was not found: ${filePath}`, err);
     return;
   }
 
-  await sheetService.authorize(options);
+  await sheetService.authorize({ clientEmail, privateKey });
 
   // Check if the first row has data.
   try {
     await sheetService.addData(data);
   } catch (err) {
-     console.error(err);
+    console.error(err);
   } finally {
-    cleanup();
+    cleanup(filePath);
   }
 }
-
 
 /**
  * Reads the specified file as a JSON file. Exposed to make testing easier
@@ -64,7 +66,7 @@ async function commit(spreadsheetKey, options, sheetService = new SheetService(s
  * @returns Object
  * @private
  */
-function readMetricFile(filePath = path.resolve(appRoot.toString(), METRICS_FILE)) {
+function readMetricFile(filePath = METRICS_FILE) {
   return JSON.parse(fs.readFileSync(filePath, { encoding: 'utf8' }));
 }
 
@@ -80,7 +82,7 @@ function initMetricsFile(filePath) {
   }
 }
 
-function cleanup(filePath = path.resolve(appRoot.toString(), METRICS_FILE)) {
+function cleanup(filePath = METRICS_FILE) {
   fs.unlinkSync(filePath);
 }
 
@@ -88,5 +90,4 @@ module.exports = {
   addMetric,
   readMetricFile,
   commit,
-  appRoot,
 };
