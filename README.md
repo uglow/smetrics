@@ -107,7 +107,7 @@ designated Google Sheet.
 - `options` <object>:
   - `clientEmail` <string> This value is available in the JSON file that you can download when setting up Authentication with a service account.
   - `privateKey` <string> This value is available in the JSON file that you can download when setting up Authentication with a service account.
-  - `dateFormat` <string> Default value 'milliseconds'.
+  - `dateFormat` <string|function> Default value 'milliseconds'.
 
 The default format for DateTime columns is `milliseconds`, which is the number of milliseconds since the epoch (e.g. 1537165777561, 
 which is equivalent to Mon Sep 17 2018 16:29:37 GMT+1000 (Australian Eastern Standard Time)).
@@ -115,6 +115,8 @@ which is equivalent to Mon Sep 17 2018 16:29:37 GMT+1000 (Australian Eastern Sta
 Alternately, you can specify the format as `googleDate`, which formats the date as `dd-mon-yyyy hh:mm:ss`. 
 Google sheets interprets this string as a date, and can be used correctly when the data is charted. You
 may need to manually format the DateTime column as a 'Date Time' in the Google Sheet (once-only).
+
+Lastly, you can supply a function for `dateFormat`, which has the signature `(timeMillis: Number) => any`.
 
 ## How it works
 

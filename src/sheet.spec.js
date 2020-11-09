@@ -17,19 +17,31 @@ describe('SheetService', () => {
 
     const service = new SheetService('foo');
     expect(service).toBeDefined();
-    expect(service.dateFormat).toEqual('milliseconds');
   });
 
-  it('should be possible to specify the dateFormat as "googleDate" or "milliseconds"', () => {
-    let service = new SheetService('foo', { dateFormat: 'googleDate' });
-    expect(service.dateFormat).toEqual('googleDate');
+  describe('dateFormat', () => {
+    it('should be possible to specify the dateFormat as "googleDate" or "milliseconds"', () => {
+      let service = new SheetService('foo', { dateFormat: 'googleDate' });
+      expect(service.dateFormat(123)).toEqual('1-Jan-1970 0:00:00');
 
-    service = new SheetService('foo', { dateFormat: 'milliseconds' });
-    expect(service.dateFormat).toEqual('milliseconds');
+      service = new SheetService('foo', { dateFormat: 'milliseconds' });
+      expect(service.dateFormat(123)).toEqual(123);
 
-    expect(() => new SheetService('foo', { dateFormat: 'unknown' })).toThrow(
-      'Invalid dateFormat. dateFormat must be one of: milliseconds, googleDate',
-    );
+      expect(() => new SheetService('foo', { dateFormat: 'unknown' })).toThrow(
+        'Invalid dateFormat. dateFormat must be one of: milliseconds, googleDate',
+      );
+    });
+
+    it('should be possible to specify the dateFormat as a function', () => {
+      const myDateFunction = () => 'not a date!';
+
+      let service = new SheetService('foo', { dateFormat: myDateFunction });
+      expect(service.dateFormat(123)).toEqual('not a date!');
+
+      expect(() => new SheetService('foo', { dateFormat: 123 })).toThrow(
+        'Invalid dateFormat. dateFormat must be a string or a function',
+      );
+    });
   });
 
   describe('.authorize()', () => {

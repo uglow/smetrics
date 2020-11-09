@@ -6,9 +6,9 @@ const SHEETS_API = 'https://sheets.googleapis.com/v4/spreadsheets/';
 const MONTH = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 const DATE_FORMATS = {
-  milliseconds: (val) => val,
-  googleDate: (val) => {
-    const d = new Date(val);
+  milliseconds: (dateMillis) => dateMillis,
+  googleDate: (dateMillis) => {
+    const d = new Date(dateMillis);
     return (
       [d.getUTCDate(), MONTH[d.getUTCMonth()], d.getUTCFullYear()].join('-') +
       ' ' +
@@ -22,9 +22,18 @@ class SheetService {
     if (!spreadsheetId) throw new Error('Spreadsheet id must be supplied');
     this.spreadsheetId = spreadsheetId;
 
-    if (!DATE_FORMATS[dateFormat])
-      throw new Error(`Invalid dateFormat. dateFormat must be one of: ${Object.keys(DATE_FORMATS).join(', ')}`);
-    this.dateFormat = dateFormat;
+    const dateFormatType = typeof dateFormat;
+
+    if (!['string', 'function'].includes(dateFormatType)) {
+      throw new Error(`Invalid dateFormat. dateFormat must be a string or a function`);
+    } else if (dateFormatType === 'string') {
+      if (!DATE_FORMATS[dateFormat]) {
+        throw new Error(`Invalid dateFormat. dateFormat must be one of: ${Object.keys(DATE_FORMATS).join(', ')}`);
+      }
+      this.dateFormat = DATE_FORMATS[dateFormat];
+    } else {
+      this.dateFormat = dateFormat;
+    }
   }
 
   authorize(creds, authService = JWT) {
@@ -52,13 +61,12 @@ class SheetService {
             console.error(err);
           }
         }
-        // Update the header then add a new row
+
+        // Update the header then add a new row, appending the dateTime as the first row
         await this.updateHeader(sheet, ['DateTime'].concat(groupedItems[sheet].map((item) => item.metric))).then(() =>
           this.appendData(
             sheet,
-            [DATE_FORMATS[this.dateFormat](groupedItems[sheet][0].t)].concat(
-              groupedItems[sheet].map((item) => item.value),
-            ),
+            [this.dateFormat(groupedItems[sheet][0].t)].concat(groupedItems[sheet].map((item) => item.value)),
           ),
         );
       });
