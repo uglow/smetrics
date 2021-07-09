@@ -86,7 +86,7 @@ You can also continue to push to your branch in light of discussion and feedback
 
 ###ProTip
 
-Pull Request comments are written in Markdown, so you can embed images and emoji, use pre-formatted text blocks, and other lightweight formatting.
+Pull Request comments are written with Markdown, so you can embed images and emoji, use pre-formatted text blocks, and other lightweight formatting.
 
 ## Merge to `master`
 
@@ -132,6 +132,3 @@ Command | Description
 Command | Description
 :------ | :----------
 <pre>npm run commitmsg</pre> | Git commit message hook that validates the commit message conforms to your commit message conventions.
-<pre>npm run pre-release</pre> | Verify code, run unit tests, check test coverage, build software. This task is designed to be run before the `semantic-release` task.<ul><li>Run `semantic-release-cli setup` once you have a remote repository. See https://github.com/semantic-release/cli for details.</li><li>Semantic-release integrates with Travis CI (or similar tools) to generate release notes for each release (which appears in the "Releases" section in GitHub) and publishes the package to NPM (when all the tests are successful) with a semantic version number.</li></ul>
-<pre>npm run prepush</pre> | Git pre-push hook that verifies code and checks unit test coverage meet minimum thresholds.
-<pre>npm run upload-coverage</pre> | Uploads code-coverage metrics to Coveralls.io<ul><li>Setup - https://coveralls.zendesk.com/hc/en-us/articles/201347419-Coveralls-currently-supports</li><li>Define an environment variable called COVERALLS_REPO_TOKEN in your build environment with the repo token from https://coveralls.io/github/<repo-name>/settings</li><li>In your CI configuration (e.g. `travis.yml`), call `npm run upload-coverage` if the build is successful.</li></ul>
