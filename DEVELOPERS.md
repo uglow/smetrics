@@ -111,7 +111,7 @@ personal access token, an NPM token, and connects them to Travis CI.
 
 One time setup:
 ```shell script
-cd oaat
+cd <to repo folder>
 npx semantic-release-cli setup
 
 ? What is your npm registry? https://registry.npmjs.org/
