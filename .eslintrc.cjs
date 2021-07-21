@@ -1,7 +1,8 @@
 module.exports = {
   root: true,
   parserOptions: {
-    ecmaVersion: 2019,
+    ecmaVersion: 2020,
+    sourceType: 'module',
   },
 
   env: {
@@ -36,5 +37,9 @@ module.exports = {
 
     // This rule is no good for test specs. Need to find a way to disable this for test specs
     'unicorn/consistent-function-scoping': 'off',
+
+    'node/no-unsupported-features/es-syntax': ['error', { ignores: ['dynamicImport', 'modules'] }],
+
+    'unicorn/prefer-node-protocol': 'off', // Turn this off for Jest
   },
 };

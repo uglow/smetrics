@@ -1,4 +1,4 @@
-const { JWT } = require('google-auth-library');
+import { JWT } from 'google-auth-library';
 
 const GOOGLE_AUTH_SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 const SHEETS_API = 'https://sheets.googleapis.com/v4/spreadsheets/';
@@ -17,7 +17,7 @@ const DATE_FORMATS = {
   },
 };
 
-class SheetService {
+export class SheetService {
   constructor(spreadsheetId, { dateFormat = 'milliseconds' } = {}) {
     if (!spreadsheetId) throw new Error('Spreadsheet id must be supplied');
     this.spreadsheetId = spreadsheetId;
@@ -43,34 +43,38 @@ class SheetService {
 
   async addData(records) {
     // First step. Assume we have multi-dimensional array.
-    records.forEach((recordArr) => {
-      // Start by grouping the elements by category
-      const groupedItems = recordArr.reduce(groupBy('sheet'), {});
+    await Promise.all(
+      records.map(async (recordArr) => {
+        // Start by grouping the elements by category
+        const groupedItems = recordArr.reduce(groupBy('sheet'), {});
 
-      // Now for each sheet...
-      Object.keys(groupedItems).forEach(async (sheet) => {
-        // Create the sheet (in case it does not exist)
-        try {
-          await this.createSheet(sheet);
-        } catch (err) {
-          if (err && err.errors && err.errors.length) {
-            if (!err.errors[0].message.includes('already exists. Please enter another name')) {
-              err.errors.forEach((item) => console.log(item));
+        // Now for each sheet...
+        await Promise.all(
+          Object.keys(groupedItems).map(async (sheet) => {
+            // Create the sheet (in case it does not exist)
+            try {
+              await this.createSheet(sheet);
+            } catch (err) {
+              if (err && err.errors && err.errors.length) {
+                if (!err.errors[0].message.includes('already exists. Please enter another name')) {
+                  for (const item of err.errors) console.log(item);
+                }
+              } else {
+                console.error(err);
+              }
             }
-          } else {
-            console.error(err);
-          }
-        }
 
-        // Update the header then add a new row, appending the dateTime as the first row
-        await this.updateHeader(sheet, ['DateTime'].concat(groupedItems[sheet].map((item) => item.metric))).then(() =>
-          this.appendData(
-            sheet,
-            [this.dateFormat(groupedItems[sheet][0].t)].concat(groupedItems[sheet].map((item) => item.value)),
-          ),
+            // Update the header then add a new row, appending the dateTime as the first row
+            await this.updateHeader(sheet, ['DateTime', ...groupedItems[sheet].map((item) => item.metric)]).then(() =>
+              this.appendData(sheet, [
+                this.dateFormat(groupedItems[sheet][0].t),
+                ...groupedItems[sheet].map((item) => item.value),
+              ]),
+            );
+          }),
         );
-      });
-    });
+      }),
+    );
   }
 
   /**
@@ -87,7 +91,7 @@ class SheetService {
       majorDimension: 'ROWS',
       values: [values],
     };
-    const res = await this.client.request({ url, method: 'put', data });
+    const res = await this.client.request({ url, method: 'PUT', data });
     return res.data;
   }
 
@@ -100,7 +104,7 @@ class SheetService {
       values: [values],
     };
 
-    const res = await this.client.request({ url, method: 'post', data });
+    const res = await this.client.request({ url, method: 'POST', data });
     return res.data;
   }
 
@@ -117,7 +121,7 @@ class SheetService {
         },
       ],
     };
-    return this.client.request({ url, method: 'post', data });
+    return this.client.request({ url, method: 'POST', data });
   }
 }
 
@@ -145,7 +149,3 @@ function columnToLetter(column) {
   }
   return letter;
 }
-
-module.exports = {
-  SheetService,
-};

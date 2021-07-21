@@ -168,7 +168,8 @@ __Setup Instructions__
    1. Click "Create Service Account" button
    1. Enter the service account name & a description for step 1 and press Create.
    1. Skip steps 2 & 3 by pressing Cancel
-   1. In the Service Accounts panel, select Actions > Create Key
+   1. In the Service Accounts panel, select Actions > Manages Key
+   1. Press Add Key > Create New Key
    1. Select the "JSON" key type option
    1. Click blue "Create" button.
    
@@ -189,7 +190,7 @@ The `private_key` field in the JSON file that is the private key.
 
 The Spreadsheet ID can be found in the URL of the spreadsheet.
 
-E.g. docs.google.com/spreadsheets/d/spreadhseetID/edit#gid=0
+E.g. docs.google.com/spreadsheets/d/:spreadsheetID:/edit#gid=0
 
 ## Graphing the results
 

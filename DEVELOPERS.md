@@ -7,7 +7,6 @@ It also explains the basic mechanics of using `git` and `node`
 - [Project Organisation](#project-organisation)
 - [Installing NPM Modules](#installing)
 - [Running Tests](#running-tests)
-- [Testing with another project](#testing-with-another-project)
 - [Formatting your Source Code](#formatting-your-source-code)
 - [Linting/verifying your Source Code](#lintingverifying-your-source-code)
 - [Semantic Release setup](#semantic-release-setup)
@@ -50,26 +49,7 @@ npm test
 npm run test:watch
 
 # Run tests and see the coverage report
-npm run test:resport
-```
-
-## Testing with another project
-
-Use `npm link` to symlink this local package into your global NPM registry on your computer. It will
-then be available for use within other NPM projects:
-
-```shell script
-# In this project root:
-npm link
-# > /.nvm/versions/node/v10.17.0/lib/node_modules/oaat -> /mydev/serverless/oaat
-
-# Change to the project directory that wants to test this package
-cd ../my-project
-
-# Create a local symlink to oaat
-npm link oaat
-# > Symlinking "/mydev/my-project/node_modules"
-# >     --> "/.nvm/versions/node/v10.17.0/lib/node_modules/oaat"
+npm run test:report
 ```
 
 ## Formatting your source code
@@ -120,7 +100,8 @@ npx semantic-release-cli setup
 ? What is your GitHub username? uglow
 ? What is your GitHub password? [hidden]
 ? What is your GitHub two-factor authentication code? 
-? What CI are you using? Travis CI (or choose "Other" and the tokens are displayed for you manually add)
+? What CI are you using? GitHub CI (or choose "Other" and the tokens are displayed for you manually add)
+
 
 ```
 
