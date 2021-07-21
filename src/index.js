@@ -1,8 +1,6 @@
-'use strict';
-
-const fs = require('fs');
-const path = require('path');
-const { SheetService } = require('./sheet');
+import fs from 'fs';
+import path from 'path';
+import { SheetService } from './sheet.js';
 
 const METRICS_FILE = path.resolve(process.cwd(), 'smetrics.json');
 
@@ -11,11 +9,13 @@ const METRICS_FILE = path.resolve(process.cwd(), 'smetrics.json');
  * @param sheetName - will become the sheetname that the metric is added too.
  * @param column
  * @param value
- * @param timestamp
- * @param filePath
+ * @param options {object}
+ * @param options.timestamp
+ * @param options.filePath
  * @returns {Object}
  */
-function addMetric(sheetName, column, value, { timestamp = Date.now(), filePath = METRICS_FILE }) {
+export function addMetric(sheetName, column, value, options = {}) {
+  const { timestamp = Date.now(), filePath = METRICS_FILE } = options;
   // Before adding a metric, setup the temporary metric file
   initMetricsFile(filePath);
 
@@ -36,9 +36,9 @@ function addMetric(sheetName, column, value, { timestamp = Date.now(), filePath 
  * @param options.dateFormat {string}   Used by the sheetService
  * @param options.filePath {string}
  * @param options.privateKey {string}
- * @param sheetService {class}
+ * @param sheetService {SheetService}
  */
-async function commit(spreadsheetId, options, sheetService = new SheetService(spreadsheetId, options)) {
+export async function commit(spreadsheetId, options, sheetService = new SheetService(spreadsheetId, options)) {
   let data;
   const { filePath = METRICS_FILE, clientEmail, privateKey } = options;
   try {
@@ -66,7 +66,7 @@ async function commit(spreadsheetId, options, sheetService = new SheetService(sp
  * @returns Object
  * @private
  */
-function readMetricFile(filePath = METRICS_FILE) {
+export function readMetricFile(filePath = METRICS_FILE) {
   return JSON.parse(fs.readFileSync(filePath, { encoding: 'utf8' }));
 }
 
@@ -74,7 +74,6 @@ function readMetricFile(filePath = METRICS_FILE) {
  * Creates the metric file if it does not exist
  * @param filePath
  * @returns {any}
- * @private
  */
 function initMetricsFile(filePath) {
   if (!fs.existsSync(filePath)) {
@@ -85,9 +84,3 @@ function initMetricsFile(filePath) {
 function cleanup(filePath = METRICS_FILE) {
   fs.unlinkSync(filePath);
 }
-
-module.exports = {
-  addMetric,
-  readMetricFile,
-  commit,
-};
