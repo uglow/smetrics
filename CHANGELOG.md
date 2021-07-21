@@ -1,3 +1,21 @@
+# [3.0.0](https://github.com/uglow/smetrics/compare/v2.1.0...v3.0.0) (2021-07-21)
+
+
+### Features
+
+* **esm:** convert package to ES modules and update tooling ([0be3701](https://github.com/uglow/smetrics/commit/0be370186a50d1a968f92dd0eb4c8c4862a15645))
+* **esm:** convert package to ES modules and update tooling ([74063cb](https://github.com/uglow/smetrics/commit/74063cb503c33db64b2208d4bdccba2718f6d06e))
+
+
+### BREAKING CHANGES
+
+* **esm:** Upgraded to use ES Modules (Node 14.13+ required)
+
+There are no functional changes in this version. It is purely a CJS to ESM conversion
+* **esm:** Upgraded to use ES Modules (Node 14.13+ required)
+
+There are no functional changes in this version. It is purely a CJS to ESM conversion
+
 # [2.1.0](https://github.com/uglow/smetrics/compare/v2.0.0...v2.1.0) (2020-11-09)
 
 
