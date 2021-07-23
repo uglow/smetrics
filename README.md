@@ -24,23 +24,11 @@ Google Sheets provides cloud-storage for the data, allowing you to see the chang
 // Lets say you've just built your code, run your unit and performance tests.
 // Now you want to persist the results somewhere so you can see the changes over time.
 
-const fs = require('fs');
-const smetrics = require('smetrics');
-
-function addUnitTestMetrics() {
-  const stats = require('./test-reports/unit.json');
-  const tabName = 'My Stats';
-  
-  smetrics.addMetric(tabName, 'Total tests', stats.numTotalTests);
-  smetrics.addMetric(tabName, 'Passed tests', stats.numPassedTests);
-}
-
-// Gather all the metrics then commit them to Google Sheets
-addUnitTestMetrics();
-...
+import fs from 'fs';
+import * as smetrics from '../src/index.js';
 
 // See Authentication section for how to generate this information
-const creds = require('./google-generated-creds.json');
+const creds = fs.readFileSync('./google-generated-creds.json').toString();
 // OR, if you cannot save the file locally (like on heroku)
 const options = {
   clientEmail: process.env.SMETRICS_GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL,
@@ -48,8 +36,24 @@ const options = {
   dateTimeFormat: 'googleDate', // defaults to 'milliseconds',
   filePath: '/tmp/yourfile.json' // defaults to CWD + 'smetrics.json'
 }
-smetrics.commit('<spreadsheet key>', options); // Async - returns a promise 
 
+// Gather all the metrics then commit them to Google Sheets
+addUnitTestMetrics();
+
+// Commit the changes (async - returns a promise)
+smetrics.commit('<spreadsheet key>', options)
+  .catch((err) => {
+    console.log(err);
+  });
+
+
+function addUnitTestMetrics() {
+  const stats = { numTotalTests: 100, numPassedTests: 99 };
+  const tabName = 'My Stats';
+  
+  smetrics.addMetric(tabName, 'Total tests', stats.numTotalTests);
+  smetrics.addMetric(tabName, 'Passed tests', stats.numPassedTests);
+}
 ```
 
 ### Important
@@ -62,14 +66,14 @@ Because this library persists state to a file, you need to specify the `filePath
 with a path underneath the `/tmp` directory:
 
 ``` js
-const fs = require('fs');
-const smetrics = require('smetrics');
+import fs from 'fs';
+import * as smetrics from '../src/index.js';
 
 // NOTE: filePath is specified explicitly, under the '/tmp' folder
 smetrics.addMetric(tabName, 'Total tests', stats.numTotalTests, { filePath: '/tmp/smetrics.json' });
 
 // See Authentication section for how to generate this information
-const creds = require('./google-generated-creds.json');
+const creds = fs.readFileSync('./google-generated-creds.json').toString();
 // OR, if you cannot save the file locally (like on heroku)
 const options = {
   clientEmail: process.env.SMETRICS_GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL,

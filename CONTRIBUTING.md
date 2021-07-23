@@ -1,12 +1,7 @@
-<!--[CN_HEADING]-->
 # Contributing
 
-Welcome! This document explains how you can contribute to making **smetrics** even better.
+Welcome! This document explains how you can contribute to making this software even better.
 
-
-<!--[]-->
-
-<!--[CN_GETTING_STARTED]-->
 # Getting Started
 
 ## Installation
@@ -14,15 +9,9 @@ Welcome! This document explains how you can contribute to making **smetrics** ev
 ```
 git clone <this repo>
 npm install -g commitizen
-# Only if wanting to setup semantic-release for the first time. Not needed for ordinary development:
-# npm install -g semantic-release-cli 
 npm install
 ```
 
-
-<!--[]-->
-
-<!--[RM_DIR_STRUCTURE]-->
 ## Directory Structure
 
 Code is organised into modules which contain one-or-more components. This a great way to ensure maintainable code by encapsulation of behavior logic. A component is basically a self contained app usually in a single file or a folder with each concern as a file: style, template, specs, e2e, and component class. Here's how it looks:
@@ -32,9 +21,9 @@ smetrics/
  │
  ├──fixtures/                     * fixture files (for tests)
  │
- ├──test-reports/                 * test reports appear here
- │
  ├──test/                         * integration test specifications
+ │
+ ├──test-reports/                 * test reports appear here
  │
  ├──CONTRIBUTING.md               * how to contribute to the project
  ├──README.md                     * this file
@@ -42,9 +31,6 @@ smetrics/
 ```
 
 
-<!--[]-->
-
-<!--[CN_GITFLOW_PROCESS]-->
 # GitFlow Development Process
 
 This project uses the [GitHub Flow](https://guides.github.com/introduction/flow/index.html) workflow.
@@ -102,10 +88,10 @@ By incorporating certain keywords into the text of your Pull Request, you can as
 
 Command | Description
 :------ | :----------
-<pre>npm test</pre> | Alias for `npm run test:unit` task
+<pre>npm test</pre> | Alias for `npm run test:unit` task, but with watch mode
 <pre>npm run test:report</pre> | Run instrumented unit tests then verify coverage meets defined thresholds<ul><li>Returns non-zero exit code when coverage does not meet thresholds (as defined in istanbul.js)</li></ul>
 <pre>npm run test:unit</pre> | Run unit tests whenever JS source or tests change<ul><li>Uses Mocha</li><li>Code coverage</li><li>Runs continuously (best to run in a separate window)</li></ul>
-<pre>npm run test:unit:once</pre> | Run unit tests once<ul><li>Uses Mocha</li><li>Code coverage</li></ul>
+<pre>npm run test:int</pre> | Integration test
 
 
 ## Verification (Linting) Tasks
